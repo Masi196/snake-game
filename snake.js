@@ -47,7 +47,9 @@ function drawSnake() {
     ctx.fillStyle = "lime";
 
     snake.forEach(part => {
-        ctx.fillRect(part.x, part.y, box, box);
+        ctx.beginPath();
+ctx.arc(part.x + box / 2, part.y + box / 2, box / 2, 0, 2 * Math.PI);
+ctx.fill();
     });
 }
 
