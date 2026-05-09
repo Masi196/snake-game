@@ -1,3 +1,4 @@
+let score = 0;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -12,6 +13,7 @@ let gameInterval;
 function startGame() {
     snake = [{ x: 200, y: 200 }];
     direction = "RIGHT";
+    score = 0;
 
     placeFood();
 
@@ -69,6 +71,9 @@ function gameLoop() {
         x: snake[0].x,
         y: snake[0].y
     };
+    ctx.fillStyle = "white";
+ctx.font = "20px Arial";
+ctx.fillText("Score: " + score, 10, 25);
 
     // Movement
     if (direction === "UP") head.y -= box;
@@ -98,10 +103,11 @@ function gameLoop() {
 
     // Eat food
     if (head.x === food.x && head.y === food.y) {
-        placeFood();
-    } else {
-        snake.pop();
-    }
+    score++;
+    placeFood();
+} else {
+    snake.pop();
+}
 
     drawSnake();
 }
