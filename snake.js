@@ -1,68 +1,81 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-let snake = [{ x: 200, y: 200 }];
-let direction = 'RIGHT';
-let food = { x: 300, y: 300 };
+const box = 20;
+let snake;
+let direction;
+let food;
+let gameInterval;
 
-document.addEventListener('keydown', changeDirection);
+function startGame() {
+    snake = [{ x: 200, y: 200 }];
+    direction = "RIGHT";
+    placeFood();
+
+    clearInterval(gameInterval);
+    gameInterval = setInterval(gameLoop, 100);
+}
+
+document.addEventListener("keydown", changeDirection);
 
 function changeDirection(event) {
-    const key = event.key;
-    if (key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-    else if (key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
-    else if (key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-    else if (key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+    if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    else if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+    else if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    else if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
 }
 
-function drawSnake() {
-    ctx.fillStyle = 'lime';
-    snake.forEach(part => {
-        ctx.fillRect(part.x, part.y, 20, 20);
-    });
+function placeFood() {
+    food = {
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box
+    };
 }
 
-function moveSnake() {
-    const head = { ...snake[0] };
-    if (direction === 'UP') head.y -= 20;
-    if (direction === 'DOWN') head.y += 20;
-    if (direction === 'LEFT') head.x -= 20;
-    if (direction === 'RIGHT') head.x += 20;
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Boundary check
-    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+    let head = { ...snake[0] };
+
+    if (direction === "UP") head.y -= box;
+    if (direction === "DOWN") head.y += box;
+    if (direction === "LEFT") head.x -= box;
+    if (direction === "RIGHT") head.x += box;
+
+    if (
+        head.x < 0 ||
+        head.x >= canvas.width ||
+        head.y < 0 ||
+        head.y >= canvas.height
+    ) {
+        clearInterval(gameInterval);
         alert("Game Over!");
+        startGame();
         return;
     }
 
     snake.unshift(head);
+
     if (head.x === food.x && head.y === food.y) {
         placeFood();
     } else {
         snake.pop();
     }
+
+    drawFood();
+    drawSnake();
 }
 
-function placeFood() {
-    food.x = Math.floor(Math.random() * (canvas.width / 20)) * 20;
-    food.y = Math.floor(Math.random() * (canvas.height / 20)) * 20;
+function drawSnake() {
+    ctx.fillStyle = "lime";
+    snake.forEach(part => {
+        ctx.fillRect(part.x, part.y, box, box);
+    });
 }
 
 function drawFood() {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(food.x, food.y, 20, 20);
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x, food.y, box, box);
 }
 
-function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawFood();
-    moveSnake();
-    drawSnake();
-    setTimeout(gameLoop, 100);
-}
-
-placeFood();
-gameLoop();
-
-
-
+startGame();
